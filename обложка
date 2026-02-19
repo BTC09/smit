@@ -1,0 +1,60 @@
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import random
+
+# Размер изображения
+width, height = 1280, 720
+
+# Создаём тёмный фон
+image = Image.new("RGB", (width, height), "#0b0000")
+draw = ImageDraw.Draw(image)
+
+# === Неоновое свечение по центру ===
+glow = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+glow_draw = ImageDraw.Draw(glow)
+
+glow_draw.ellipse(
+    (width//2 - 300, height//2 - 300, width//2 + 300, height//2 + 300),
+    fill=(255, 0, 0, 120)
+)
+
+glow = glow.filter(ImageFilter.GaussianBlur(120))
+image.paste(glow, (0, 0), glow)
+
+# === Золотые фишки (круги) ===
+for _ in range(25):
+    x = random.randint(0, width)
+    y = random.randint(0, height)
+    r = random.randint(20, 50)
+    draw.ellipse((x-r, y-r, x+r, y+r), outline="#FFD700", width=4)
+
+# === Заголовок Smeet ===
+try:
+    font_big = ImageFont.truetype("arial.ttf", 160)
+except:
+    font_big = ImageFont.load_default()
+
+text = "SMEET"
+text_width, text_height = draw.textbbox((0, 0), text, font=font_big)[2:]
+
+# Тень (свечение)
+for offset in range(10, 0, -2):
+    draw.text(
+        ((width - text_width)//2 + offset,
+         (height - text_height)//2 + offset),
+        text,
+        font=font_big,
+        fill=(255, 0, 0, 80)
+    )
+
+# Основной текст (золото)
+draw.text(
+    ((width - text_width)//2, (height - text_height)//2),
+    text,
+    font=font_big,
+    fill="#FFD700"
+)
+
+# Сохраняем
+image.save("smeet_casino_background.png")
+
+print("Фон создан: smeet_casino_background.png")
